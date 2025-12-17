@@ -289,7 +289,7 @@ function postTableHighlight() {
     tableDomList.forEach((el) => {
       const wrapper = document.createElement("div");
       wrapper.classList.add("wp-block-table");
-      wrapper.style.overflow = "auto hidden";
+      wrapper.style.overflow = "auto";
       el.parentNode.insertBefore(wrapper, el);
       wrapper.appendChild(el);
     });
