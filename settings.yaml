@@ -39,7 +39,7 @@ spec:
           value: 开发者,攻城狮,细节控,写博客
           help: "必须使用英文逗号分隔，最多四个词语"
 
-        - $formkit: repeater
+        - $formkit: array
           name: home_links
           label: 社交链接
           value:
@@ -49,6 +49,11 @@ spec:
             - value: github
             - value: telegram
             - value: email
+          itemLabels:
+            - type: text
+              label: $value.value
+            - type: text
+              label: $value.home_links_url
           children:
             - $formkit: select
               name: value
@@ -209,13 +214,18 @@ spec:
     - group: footer
       label: 页脚
       formSchema:
-        - $formkit: repeater
+        - $formkit: array
           name: sfooter_info
           label: 底部信息
           value:
             - sf_title: 鄂ICP备xxxxxxx号
               sf_link: https://beian.miit.gov.cn/
               sf_img: /themes/halo-theme-vapor/assets/imgs/icpb.webp
+          itemLabels:
+            - type: image
+              label: $value.sf_img
+            - type: text
+              label: $value.sf_title
           children:
             - $formkit: text
               name: sf_title
