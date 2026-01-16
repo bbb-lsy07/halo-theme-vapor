@@ -1,0 +1,12 @@
+<div class="flex flex-wrap gap-2" th:with="tags = ${tagFinder.listAll()}" th:fragment="tag-filter(tag)">
+  <a
+    th:each="tagItem,iter : ${tags}"
+    th:href="@{${tagItem.status.permalink}}"
+    class="flex items-center gap-1 rounded-full bg-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-500 transition-colors dark:bg-zinc-800 dark:text-zinc-400"
+    th:classappend="(${tag} and ${tag.metadata.name == tagItem.metadata.name}) or (not ${tag} and ${iter.index == 0}) ? '!bg-zinc-800 !text-zinc-200 dark:!bg-zinc-200 dark:!text-zinc-800' : ''"
+  >
+    <i class="iconfont icon-huati"></i>
+    <th:block th:text="${tagItem.spec.displayName}"></th:block>
+    <sup th:text="${tagItem.postCount ?: 0}"></sup>
+  </a>
+</div>

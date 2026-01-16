@@ -1,0 +1,12 @@
+<div class="flex flex-wrap gap-2" th:with="cates = ${categoryFinder.listAll()}" th:fragment="cate-filter(cate)">
+  <a
+    th:each="cateItem,iter : ${cates}"
+    th:href="@{${cateItem.status.permalink}}"
+    class="flex items-center gap-1 rounded-full bg-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-500 transition-colors dark:bg-zinc-800 dark:text-zinc-400"
+    th:classappend="(${cate} and ${cate.metadata.name == cateItem.metadata.name}) or (not ${cate} and ${iter.index == 0}) ? '!bg-zinc-800 !text-zinc-200 dark:!bg-zinc-200 dark:!text-zinc-800' : ''"
+  >
+    <i class="iconfont icon-cate"></i>
+    <th:block th:text="${cateItem.spec.displayName}"></th:block>
+    <sup th:text="${cateItem.postCount ?: 0}"></sup>
+  </a>
+</div>

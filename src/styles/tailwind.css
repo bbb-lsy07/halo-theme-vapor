@@ -1,0 +1,311 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 3rem;
+}
+
+[data-radix-popper-content-wrapper] {
+  z-index: 99999 !important;
+}
+
+[data-floating-ui-portal] {
+  z-index: 100000;
+}
+
+::selection {
+  background-color: theme("colors.lime.500");
+  color: theme("colors.lime.950");
+}
+
+@keyframes typing-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+:root {
+  --vapor--nav-height: 3rem;
+  --primary-color: hsl(213, 100%, 48%);
+  --vapor--color-primary: 213 100% 48%;
+  --font-sans: "Manrope";
+}
+
+body {
+  background: var(--bg-color);
+  overflow: hidden;
+}
+
+.rounded-theme {
+  border-radius: 1rem;
+}
+
+.shadow-nav {
+  box-shadow: rgba(0, 9, 50, 0.086) 0px 0.602187px 0.602187px -1.25px,
+    rgba(0, 9, 50, 0.075) 0px 2.28853px 2.28853px -2.5px, rgba(0, 9, 50, 0.03) 0px 10px 10px -3.75px;
+}
+
+.blur-before {
+  --trfm: scaleY(0.95) translateY(1rem);
+  --filter: blur(10px);
+  animation: var(--animation);
+  animation-duration: 0.5s;
+  animation-delay: var(--delay, 0.4s);
+}
+
+img:where(.load) {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img:where(.loaded) {
+  opacity: 1;
+}
+
+/* =view transition route change animation
+----------------------------------------------- */
+@media (prefers-reduced-motion) {
+  ::view-transition-group(*),
+  ::view-transition-new(*),
+  ::view-transition-old(*) {
+    animation: none !important;
+  }
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-new(*),
+::view-transition-old(*) {
+  backface-visibility: hidden;
+  mix-blend-mode: normal;
+}
+
+@property --aspect--view-transition--progress {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes aspect-view-transition {
+  0% {
+    --aspect--view-transition--progress: 0;
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    --aspect--view-transition--progress: 1;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+::view-transition-old(root) {
+  animation: aspect-view-transition 0.6s cubic-bezier(0.35, 0, 0.4, 1);
+  animation-delay: 0s;
+  animation-fill-mode: both;
+}
+
+::view-transition-new(root) {
+  animation: aspect-view-transition 0.6s cubic-bezier(0.35, 0, 0.4, 1);
+  animation-fill-mode: both;
+  -webkit-mask-image: linear-gradient(
+    270deg,
+    #000 calc(-70% + 170% * var(--aspect--view-transition--progress)),
+    transparent calc(170% * var(--aspect--view-transition--progress))
+  );
+  mask-image: linear-gradient(
+    270deg,
+    #000 calc(-70% + 170% * var(--aspect--view-transition--progress)),
+    transparent calc(170% * var(--aspect--view-transition--progress))
+  );
+}
+
+.wp-block-gallery {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em !important;
+  align-items: center !important;
+  justify-content: var(--caption-align, space-between);
+}
+
+#article .wp-block-gallery:not(.loaded) {
+  max-height: min(var(--image-max-size, 55vh) + 3em, 100vh);
+}
+
+#article .wp-block-gallery > *:not(vapor-loaed) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s, pointer-events 0s;
+}
+
+#article .wp-block-gallery.loaded > *:not(vapor-loaed) {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.wp-block-gallery vapor-loaed {
+  --trfm: none;
+  --loaed-play: running;
+  width: 100%;
+  height: 100%;
+}
+
+.wp-block-gallery.has-nested-images figure.wp-block-image:has(figcaption):before {
+  pointer-events: none;
+  border-radius: var(--vapor--size-radius);
+}
+
+figure.f-carousel.wp-block-gallery {
+  --caption-size: auto;
+  --wp--style--unstable-gallery-gap: 1rem;
+}
+
+figure.f-carousel.wp-block-gallery:is(.alignfull, .alignwide) {
+  --image-max-size: 80vh;
+  --caption-align: center;
+}
+
+figure.f-carousel.wp-block-gallery.alignfull {
+  --image-max-size: 100vh;
+  --caption-size: unset;
+  --f-button-width: 3.5em;
+  --f-button-height: 3.5em;
+  --f-button-bg: hsl(var(--thyuu--color-font) / 10%);
+  --f-button-color: #fff;
+  --f-button-next-pos: var(--thyuu--size-edgelr);
+  --f-button-prev-pos: var(--thyuu--size-edgelr);
+}
+
+figure.f-carousel.wp-block-gallery figcaption {
+  margin: 0;
+  flex: var(--caption-size);
+  text-align: left;
+}
+
+figure.f-carousel.wp-block-gallery .wp-block-image {
+  margin: 0 var(--wp--style--unstable-gallery-gap) 0 0 !important;
+}
+
+figure.f-carousel.wp-block-gallery:not(.is-cropped) .wp-block-image {
+  width: auto !important;
+}
+
+figure.f-carousel.wp-block-gallery .wp-block-image img {
+  height: 100%;
+  min-height: var(--thyuu--size-card-normal);
+  max-height: var(--image-max-size, 55vh);
+}
+
+figure.f-carousel.wp-block-gallery .f-carousel__nav {
+  order: 3;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+figure.f-carousel.wp-block-gallery .f-carousel__dots,
+figure.f-carousel.wp-block-gallery:not(.alignfull) .f-carousel__nav .f-button {
+  position: static;
+  transform: none;
+  margin: 0 !important;
+}
+
+/* =Table
+----------------------------------------------- */
+.wp-block-table {
+  max-height: max(var(--vapor--size-card-normal), 80vh - var(--vapor--size-edgetb));
+  font-size: max(var(--vapor--size-medium), 0.75em);
+  border: var(--vapor--border) !important;
+  border-radius: var(--vapor--size-radius);
+  background: var(--vapor--color-back-white) !important;
+  white-space: pre;
+  overflow: auto;
+}
+
+.wp-block-table :is(td, th) {
+  padding-inline: 1em;
+  padding: 0.5em;
+  border: var(--vapor--border);
+  border-width: thin thin 0 0;
+}
+
+.wp-block-table :is(td, th):last-child {
+  border-right: 0;
+}
+
+.wp-block-table tr:first-of-type {
+  border: 0;
+  font-size: 1.1em;
+}
+
+.wp-block-table tr:first-of-type :is(th, td) {
+  position: sticky;
+  top: 0;
+  border: 0;
+  background: linear-gradient(hsl(var(--vapor--main-color) / 5%) 0 0) var(--vapor--color-back-white);
+  z-index: 2;
+}
+.wp-block-table.is-style-stripes tbody tr:nth-child(odd) {
+  background: var(--vapor--color-back-font);
+}
+
+.wp-block-table tr:hover {
+  background: hsl(var(--vapor--subs-color) / 0.05) !important;
+  transition: background 0.3s;
+}
+
+.wp-block-table figcaption {
+  padding: 0.5em 1em;
+  border-top: var(--vapor--border);
+  border-radius: 0;
+  background: var(--vapor--color-back-font);
+  position: sticky;
+  left: 0;
+  white-space: normal;
+}
+.prose-moments p {
+  margin: 0.25rem 0 !important;
+}
+
+.prose-moments p:last-of-type {
+  margin: 0 !important;
+}
+/* 超链接卡片样式 */
+.dark hyperlink-inline-card {
+  --halo-hyperlink-card-inline-bg-color: transparent !important;
+  --halo-hyperlink-card-inline-title-color: #a1a1aa !important;
+}
+
+hyperlink-inline-card {
+  --halo-hyperlink-card-inline-bg-color: transparent !important;
+  --halo-hyperlink-card-inline-title-color: #52525b !important;
+}
+hyperlink-inline-card {
+  font-weight: 600;
+}
+
+/* 订阅卡片样式 */
+.dark follow-card {
+  --follow-title-color: #52525b;
+  --follow-description-color: #71717a;
+  --follow-bg-color: transparent;
+  --follow-input-bg: transparent; 
+  --follow-button-bg: #14b8a6;
+  --follow-card-shadow: none;
+  --follow-card-border: none;
+  --follow-card-radius: none;  
+}

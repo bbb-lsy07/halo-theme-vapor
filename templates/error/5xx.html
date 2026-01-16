@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content},page_js = null,_title = '未找到页面',_head = ~{::head})}"
+>
+  <th:block th:fragment="content">
+    <div class="mt-16 sm:mt-48 sm:px-8">
+      <div class="mx-auto max-w-7xl lg:px-8">
+        <div class="relative z-10 px-4 lg:px-8">
+          <div class="max-w-2xl">
+            <img class="cover w-screen md:w-[240px]" th:src="${#theme.assets('/imgs/5xx.avif')}" alt="" />
+            <div
+              class="mt-6 space-y-2 text-zinc-700 dark:text-zinc-400"
+              th:utext="${theme.config.style.error_content}"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</html>
+
+<style>
+  #site-main {
+    min-height: calc(100vh - 23rem);
+  }
+</style>
