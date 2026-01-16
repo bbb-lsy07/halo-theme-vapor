@@ -151,22 +151,25 @@
                     </svg>
                     <span th:text="${#dates.format(post.spec.publishTime,'yyyy/MM/dd')}"></span>
                   </time>
-                  <a
-                    th:href="@{${post.categories[0].status.permalink}}"
-                    th:if="${#lists.size(post.categories) gt 0}"
-                    class="inline-flex items-center transition-colors hover:text-lime-500 hover:underline"
-                  >
-                    <i class="iconfont icon-cate text-sm"></i>&nbsp;
-                    <span th:text="${post.categories[0].spec.displayName}"></span>
-                  </a>
-                  <a
-                    th:href="@{${post.tags[0].status.permalink}}"
-                    th:if="${#lists.size(post.tags) gt 0}"
-                    class="inline-flex items-center transition-colors hover:text-lime-500 hover:underline"
-                  >
-                    <i class="iconfont icon-huati text-sm"></i>&nbsp;
-                    <span th:text="${post.tags[0].spec.displayName}"></span>
-                  </a>
+
+                  <th:block th:each="cate : ${post.categories}" th:if="${#lists.size(post.categories) gt 0}">
+                    <a
+                      th:href="@{${cate.status.permalink}}"
+                      class="inline-flex items-center transition-colors hover:text-lime-500 hover:underline"
+                    >
+                      <i class="iconfont icon-cate text-sm"></i>&nbsp;
+                      <span th:text="${cate.spec.displayName}"></span>
+                    </a>
+                  </th:block>
+                  <th:block th:each="tag : ${post.tags}" th:if="${#lists.size(post.tags) gt 0}">
+                    <a
+                      th:href="@{${tag.status.permalink}}"
+                      class="inline-flex items-center transition-colors hover:text-lime-500 hover:underline"
+                    >
+                      <i class="iconfont icon-huati text-sm"></i>&nbsp;
+                      <span th:text="${tag.spec.displayName}"></span>
+                    </a>
+                  </th:block>
                 </div>
                 <h1 class="font-slogan mt-6 w-full text-4xl font-bold text-zinc-800 sm:text-5xl dark:text-zinc-100">
                   <span
