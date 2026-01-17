@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html (content = ~{::content},page_js = ~{::page_js},_title = ${title},_head = ~{::head})}"
+>
+  <th:block th:fragment="content">
+    <div class="relative z-[2] mt-32 sm:px-8 lg:mt-48">
+      <div class="mx-auto max-w-7xl lg:px-8">
+        <div class="relative px-4 md:px-8">
+          <header class="fade-before relative z-[2] max-w-2xl">
+            <h1 class="font-slogan text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+              [[${theme.config.links.title}]]
+            </h1>
+            <p class="my-6 text-base text-zinc-600 dark:text-zinc-400">
+              <span style="display: inline-block; vertical-align: top; text-decoration: inherit; text-wrap: balance">
+                [[${theme.config.links.description}]]
+              </span>
+            </p>
+          </header>
+          <th:block th:each="group : ${groups}" th:if="${#annotations.getOrDefault(group, 'hide','false') == 'false'}">
+            <div
+              class="blur-before flex items-center gap-1 py-14 font-bold text-zinc-600 after:ml-2 after:h-0 after:flex-1 after:border-b after:border-dashed after:border-zinc-100 after:content-[''] sm:py-8 dark:text-zinc-200 after:dark:border-zinc-700/40"
+            >
+              <span
+                th:if="${#annotations.contains(group, 'icon') and #annotations.get(group, 'icon') != ''}"
+                class="iconify h-6 w-6"
+                th:data-icon="${#annotations.get(group, 'icon')}"
+              ></span>
+              <svg
+                th:unless="${#annotations.contains(group, 'icon') and #annotations.get(group, 'icon') != ''}"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-satellite-dish-icon lucide-satellite-dish"
+              >
+                <path d="M4 10a7.31 7.31 0 0 0 10 10Z" />
+                <path d="m9 15 3-3" />
+                <path d="M17 13a6 6 0 0 0-6-6" />
+                <path d="M21 13A10 10 0 0 0 11 3" />
+              </svg>
+              <span>[[${group.spec.displayName}]]</span>
+            </div>
+            <ul class="page-links grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+              <th:block
+                th:each="link : ${group.links}"
+                th:if="${#annotations.getOrDefault(link, 'hide','false') == 'false'}"
+              >
+                <th:block id="123" th:replace="~{modules/favlink-item  :: favlink-item(${link})}" />
+              </th:block>
+            </ul>
+          </th:block>
+          <th:block th:replace="~{modules/add-link}" />
+          <h2
+            class="blur-before mb-[1em] mt-[2em] flex items-center border-t border-zinc-100 pt-10 text-xl font-bold text-zinc-800 dark:border-zinc-700/40 dark:text-zinc-100"
+          >
+            <i class="iconfont icon-tishi mr-1 text-xl"></i>友链申请规则
+          </h2>
+          <div class="blur-before text-sm text-zinc-800 dark:text-zinc-100">
+            <th:block th:utext="${theme.config.links.content}"></th:block>
+          </div>
+          <details class="blur-before scottstudio-collapse flex-1">
+            <summary>我的友链信息</summary>
+            <ul id="copy" class="space-y-2 text-sm">
+              <li class="flex gap-2"><span class="text-lime-500">站名</span><em th:text="${site.title}"></em></li>
+              <li class="flex gap-2"><span class="text-lime-500">简述</span><em th:text="${theme.config.links.subtitle}"></em></li>
+              <li class="flex gap-2">
+                <span class="text-lime-500">邮箱</span><em th:text="${theme.config.links.admin_email}"></em>
+              </li>
+              <li class="flex gap-2"><span class="text-lime-500">链接</span><em th:text="${site.url}"></em></li>
+              <li class="flex gap-2" th:if="${pluginFinder.available('PluginFeed')}">
+                <span class="text-lime-500">订阅</span><em th:text="${site.url+'/rss.xml'}"></em>
+              </li>
+              <li class="flex gap-2">
+                <span class="text-lime-500">标识</span>
+                <em th:text="${site.logo.startsWith('http') ? site.logo : site.url + site.logo}"></em>
+              </li>
+            </ul>
+          </details>
+          <a
+            class="blur-before button has-thyuu-color iconfont icon-add mb-8"
+            data-fancybox=""
+            data-src="#add"
+            data-slug="add"
+            role="button"
+          >
+            <span>添加友链</span>
+          </a>
+          <th:block th:if="${theme.config.links.enable_comment}">
+            <th:block
+              th:replace="~{modules/widgets/comment :: page(${pluginName},'Plugin','plugin.halo.run')}"
+            ></th:block>
+          </th:block>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</html>
+<th:block th:fragment="page_js">
+  <th:block th:replace="~{modules/widgets/fancy}"></th:block>
+  <script th:src="@{/assets/js/marked.umd.js?v={version}(version='1.2.2')}"></script>
+</th:block>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    animateDelayed(".page-links", "blur-before", 0, 0.1);
+  });
+</script>

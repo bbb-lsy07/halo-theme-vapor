@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(content = ~{::content},page_js = ~{::page_js},_title = '朋友圈',_head = ~{::head})}"
+>
+  <th:block th:fragment="head">
+    <style>
+      /* --- 强制网格布局 (解决对齐问题) --- */
+      .friends-list {
+        display: grid !important;
+        grid-template-columns: repeat(1, 1fr) !important; /* 手机单列 */
+        gap: 20px !important;
+        min-height: 50vh;
+        padding: 5px; /* 防止阴影被截断 */
+      }
+
+      /* 平板双列 */
+      @media (min-width: 768px) {
+        .friends-list {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+      }
+
+      /* 电脑三列 (强制9个平齐的关键) */
+      @media (min-width: 1024px) {
+        .friends-list {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+      }
+
+      /* --- 卡片高级样式 (解决质感问题) --- */
+      .friend-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 16px; /* 圆角 */
+        /* 浅色模式：微渐变白底 + 极细边框 */
+        background: linear-gradient(180deg, #ffffff 0%, #f9f9f9 100%);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity: 0; /* 初始隐藏，给动画用 */
+        animation: fadeInUp 0.6s ease forwards;
+        will-change: transform, opacity;
+      }
+
+      /* 悬停效果：上浮 + 绿色光晕 + 阴影加深 */
+      .friend-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(132, 204, 22, 0.4); /* 青柠色边框 */
+        box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(132, 204, 22, 0.1);
+      }
+
+      /* 深色模式适配 */
+      html.dark .friend-card {
+        background: linear-gradient(180deg, #18181b 0%, #27272a 100%);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: none;
+      }
+
+      html.dark .friend-card:hover {
+        border-color: rgba(132, 204, 22, 0.3);
+        background: #27272a;
+      }
+
+      /* --- 内容排版 --- */
+      .card-body {
+        flex: 1;
+        padding: 20px;
+      }
+
+      .card-title {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 17px;
+        font-weight: 700;
+        color: #333;
+        line-height: 1.4;
+        text-decoration: none;
+        transition: color 0.2s;
+        /* 单行省略 */
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      html.dark .card-title {
+        color: #eee;
+      }
+
+      .friend-card:hover .card-title {
+        color: #65a30d;
+      } /* 悬停变青柠色 */
+
+      .card-desc {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+        /* 多行省略 - 2行 */
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        height: 42px; /* 强制高度对齐 */
+      }
+
+      html.dark .card-desc {
+        color: #999;
+      }
+
+      /* --- 底部信息栏 --- */
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        background: rgba(249, 250, 251, 0.8); /* 浅灰底色区分 */
+        border-top: 1px solid rgba(0, 0, 0, 0.04);
+      }
+
+      html.dark .card-footer {
+        background: rgba(255, 255, 255, 0.03);
+        border-top-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .author-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0; /* 防止挤出 */
+      }
+
+      .author-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #f0f0f0;
+        border: 2px solid #fff;
+        flex-shrink: 0;
+        transition: transform 0.3s;
+      }
+
+      html.dark .author-img {
+        border-color: #3f3f46;
+        background: #333;
+      }
+
+      .friend-card:hover .author-img {
+        transform: scale(1.1);
+      }
+
+      .author-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .author-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: #444;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .author-name:hover {
+        color: #65a30d;
+      }
+
+      html.dark .author-name {
+        color: #ddd;
+      }
+
+      .update-time {
+        font-size: 10px;
+        color: #999;
+        margin-top: 1px;
+      }
+
+      /* 装饰箭头 */
+      .arrow-icon {
+        color: #ccc;
+        font-size: 14px;
+        transform: translateX(-5px);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .friend-card:hover .arrow-icon {
+        transform: translateX(0);
+        opacity: 1;
+        color: #65a30d;
+      }
+
+      /* --- 性能与对齐优化 --- */
+      /* 强制第10个及以后的隐藏，确保3x3对齐 */
+      .friend-card:nth-child(n + 10) {
+        display: none !important;
+      }
+
+      /* 纯CSS动画延迟 */
+      .friend-card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .friend-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .friend-card:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .friend-card:nth-child(4) {
+        animation-delay: 0.2s;
+      }
+      .friend-card:nth-child(5) {
+        animation-delay: 0.25s;
+      }
+      .friend-card:nth-child(6) {
+        animation-delay: 0.3s;
+      }
+      .friend-card:nth-child(7) {
+        animation-delay: 0.35s;
+      }
+      .friend-card:nth-child(8) {
+        animation-delay: 0.4s;
+      }
+      .friend-card:nth-child(9) {
+        animation-delay: 0.45s;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </th:block>
+  <th:block th:fragment="content">
+    <div class="relative z-[2] mt-32 sm:px-8 lg:mt-48">
+      <div class="mx-auto max-w-7xl lg:px-8">
+        <div class="relative px-4 md:px-8">
+          <header class="fade-before relative z-[2] max-w-2xl">
+            <h1
+              class="font-slogan group flex items-center text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100"
+            >
+              <svg
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180"
+              >
+                <path
+                  d="M4.35 17.4V18.75M4.35 18.75V20.1M4.35 18.75H5.7M4.35 18.75H3M12.9 3L13.2202 5.51971C13.6243 8.69877 16.0808 11.2281 19.2467 11.7249L21 12L19.2467 12.2751C16.0808 12.7719 13.6243 15.3012 13.2202 18.4803L12.9 21L12.5798 18.4803C12.1757 15.3012 9.71919 12.7719 6.5533 12.2751L4.8 12L6.5533 11.7249C9.71919 11.2281 12.1757 8.69877 12.5798 5.51971L12.9 3ZM5.7 3L5.76713 3.40758C5.95525 4.54964 6.85036 5.44475 7.99242 5.63286L8.4 5.7L7.99242 5.76713C6.85036 5.95525 5.95525 6.85036 5.76713 7.99242L5.7 8.4L5.63286 7.99242C5.44475 6.85036 4.54964 5.95525 3.40758 5.76713L3 5.7L3.40758 5.63286C4.54964 5.44475 5.44475 4.54964 5.63286 3.40758L5.7 3Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+              朋友圈
+            </h1>
+            <p class="my-6 text-base text-zinc-600 dark:text-zinc-400">
+              <span style="display: inline-block; vertical-align: top; text-decoration: inherit; text-wrap: balance">
+                发现朋友们的精彩内容，探索更广阔的世界
+              </span>
+            </p>
+          </header>
+
+          <main>
+            <th:block th:if="${friends.total == 0}">
+              <div class="fade-before relative z-[2] mx-auto my-16 max-w-md">
+                <div
+                  class="relative rounded-2xl border border-zinc-100 p-6 transition-opacity dark:border-zinc-700/40"
+                >
+                  <h2 class="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    <i class="iconfont icon-tishi"></i>
+                    <span class="ml-2">暂时没有朋友圈内容</span>
+                  </h2>
+                  <p class="mt-2 text-xs text-zinc-600 md:text-sm dark:text-zinc-400">
+                    朋友们还没有发布新的内容，稍后再来看看吧。
+                  </p>
+                </div>
+              </div>
+            </th:block>
+
+            <ul th:unless="${friends.total == 0}" class="friends-list">
+              <th:block th:each="friend : ${friends.items}" th:with="spec = ${friend.spec}">
+                <li class="friend-card">
+                  <div class="card-body">
+                    <a
+                      th:href="${spec.postLink}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="card-title"
+                      th:text="${spec.title}"
+                    ></a>
+                    <p
+                      th:if="${not #strings.isEmpty(spec.description)}"
+                      class="card-desc"
+                      th:text="${spec.description}"
+                    ></p>
+                  </div>
+                  <div class="card-footer">
+                    <div class="author-box">
+                      <a th:href="${spec.authorUrl}" target="_blank" rel="noopener noreferrer">
+                        <img
+                          th:src="${spec.logo}"
+                          th:alt="${spec.author}"
+                          class="author-img"
+                          loading="lazy"
+                          decoding="async"
+                          width="32"
+                          height="32"
+                        />
+                      </a>
+                      <div class="author-info">
+                        <a
+                          th:href="${spec.authorUrl}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="author-name"
+                          th:text="${spec.author}"
+                        ></a>
+                        <span class="update-time" th:text="${#dates.format(spec.pubDate,'MM/dd') + ' 更新'}"></span>
+                      </div>
+                    </div>
+                    <div class="arrow-icon">
+                      <svg
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M13 5L20 12M20 12L13 19M20 12H4"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                </li>
+              </th:block>
+            </ul>
+
+            <th:block th:replace="~{modules/widgets/pagination :: page('/friends',${friends})}"></th:block>
+          </main>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  <th:block th:fragment="page_js">
+    <!-- 纯 CSS 动画，无需 JS -->
+  </th:block>
+</html>

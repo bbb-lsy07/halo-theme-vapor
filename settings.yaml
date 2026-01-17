@@ -1,0 +1,319 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: theme-vapor-setting
+spec:
+  forms:
+    - group: layout
+      label: 首页
+      formSchema:
+        - $formkit: attachment
+          name: home_avatar
+          id: home_avatar
+          key: home_avatar
+          label: 首页展示头像
+          value: ""
+        - $formkit: code
+          language: html
+          height: 200px
+          name: home_slogan
+          id: home_slogan
+          key: home_slogan
+          label: 首页介绍词
+
+        - $formkit: number
+          name: featured_focus_num
+          id: featured_focus_num
+          key: featured_focus_num
+          label: 推荐阅读｜数量
+          value: 6
+          min: 0
+          help: 默认 6 条。输入 0 则关闭该板块。
+          validation: required
+
+        - $formkit: text
+          name: blogger_keywords
+          id: blogger_keywords
+          key: blogger_keywords
+          label: 博主介绍关键词
+          value: 开发者,攻城狮,细节控,写博客
+          help: "必须使用英文逗号分隔，最多四个词语"
+
+        - $formkit: array
+          name: home_links
+          label: 社交链接
+          value:
+            - value: twitter
+            - value: youtube
+            - value: bilibili
+            - value: github
+            - value: telegram
+            - value: email
+          itemLabels:
+            - type: text
+              label: $value.value
+            - type: text
+              label: $value.home_links_url
+          children:
+            - $formkit: select
+              name: value
+              label: 类型
+              options:
+                - label: 首页邮箱
+                  value: email
+                - label: Twitter
+                  value: twitter
+                - label: Youtube
+                  value: youtube
+                - label: 哔哩哔哩
+                  value: bilibili
+                - label: Github
+                  value: github
+                - label: Telegram
+                  value: telegram
+
+                - label: Gitee
+                  value: gitee
+                - label: 少数派
+                  value: shaoshupai
+                - label: 掘金
+                  value: juejin
+                - label: CSDN
+                  value: csdn
+                - label: 知乎
+                  value: zhihu
+
+                - label: 微博链接
+                  value: weibo
+                - label: 微信（个人）
+                  value: weixin
+                - label: 微信公众号
+                  value: weixin_mp
+                - label: 小红书
+                  value: xiaohongshu
+                - label: 酷安
+                  value: coolapk
+                - label: 社区/论坛
+                  value: community
+
+                - label: 自定义
+                  value: custom
+            - $formkit: text
+              name: home_links_url
+              label: 链接
+            - $formkit: attachment
+              if: '$value.value === "custom"'
+              name: custom_icon
+              label: 自定义图标
+              help: "请选择图标，推荐使用SVG格式图标。"
+
+    - group: style
+      label: 文案与样式
+      formSchema:
+        - $formkit: select
+          name: color_scheme
+          label: 默认配色
+          value: system
+          options:
+            - label: 跟随系统
+              value: system
+            - label: 深色
+              value: dark
+            - label: 浅色
+              value: light
+        - $formkit: text
+          name: archive_title
+          label: 文章归档介标题
+          value: 欢迎光临我的博客
+          validation: required
+        - $formkit: code
+          name: archive_slogan
+          label: 文章归档介绍词
+          height: 200px
+          language: html
+          value: '<span style="display: inline-block;vertical-align: top;text-decoration: inherit;text-wrap: balance;">
+            🌿
+            欢迎闯入这片文字森林！这里收纳着每一篇用心书写的故事、思考与感悟，像散落的星光等待被点亮。无论你是寻觅共鸣的同频者，还是偶然驻足的旅人，都请随意翻阅
+            —— 或许下一篇，就藏着你想遇见的温度与答案～
+            </span>'
+        - $formkit: text
+          name: search_description
+          label: 搜索页面描述
+          value: 搜索方式覆盖标题、摘要和全文，建议扩大词意搜索。
+        - $formkit: code
+          name: notfound_content
+          label: 404页面文案
+          height: 200px
+          language: html
+          value: '
+            <h1 class="!mb-4 text-2xl font-bold">很抱歉，您访问的页面迷路啦～</h1>
+            <p class="text-zinc-500 dark:text-zinc-400">
+            它可能去探索星辰大海，也可能在代码丛林里迷了路。别担心，我们帮您找回家的方向：
+            </p>
+            <ul class="!mt-8 list-disc space-y-2 pl-5 text-zinc-600 dark:text-zinc-400">
+            <li>
+            ✨ 点击
+            <a href="/" class="font-bold text-zinc-500 hover:underline">首页</a>
+            ，开启新的探索之旅
+            </li>
+            <li>🧭 用顶部搜索栏找找你心仪的内容</li>
+            <li>📫 若有特别想念的页面，不妨给我留言 “召唤” 它～</li>
+            </ul>
+            <p>稍等片刻，让我们一起重新点亮这个角落吧 🌟</p>'
+        - $formkit: code
+          name: error_content
+          label: 5xx页面文案
+          height: 200px
+          language: html
+          value: '<h1 class="!mb-4 text-2xl font-bold">哎呀，看来服务器此刻有点小迷糊～</h1>
+            <p class="text-zinc-500 dark:text-zinc-400">
+            您访问的页面暂时无法顺利加载，这可能是我们正在进行后台维护，或是突如其来的流量小高峰导致的小插曲。
+            </p>
+            <p class="font-semibold">别担心，技术小哥已经收到信号，正在快马加鞭处理啦！</p>
+            <p>您可以尝试：</p>
+            <ul class="!mt-8 list-disc space-y-2 pl-5 text-zinc-600 dark:text-zinc-400">
+            <li>🌱 刷新页面再试一次</li>
+            <li>🧭 稍后几分钟重新访问</li>
+            <li>📫 若问题持续，欢迎留言告诉我们具体情况</li>
+            </ul>
+            <p>感谢您的耐心等待，我们会尽快让一切恢复正常～ 🌟</p>'
+
+    - group: links
+      label: 友链页
+      formSchema:
+        - $formkit: text
+          name: title
+          label: 标题
+          value: 友链
+          validation: required
+        - $formkit: text
+          name: description
+          label: 描述
+          value: 我非常并且迫切地希望能在您热情地提交之前，看到我们的交流互动，生活博客比较看重仪式感，所以不妨让我们互相了解使得连接更紧实吧。
+        - $formkit: code
+          name: content
+          label: 内容
+          height: 200px
+          language: html
+          value: '<p style="font-weight: 400;">很高兴能和非常多的朋友们交流，如果你也想加入友链，可以点击下方添加按钮进行申请。<mark>（本站已开启友链提交自动审核，您的链接将会第一时间被添加。）</mark></p><div style="height:1rem" aria-hidden="true" class="wp-block-spacer"></div><ul class="wp-block-list thyuu-block"><li>1. 交流互动并且保持联系（重点）；</li><li>2. 至少有 10 篇原创文章；</li><li>3. 请提前做好本站链接。</li></ul>'
+        - $formkit: text
+          name: subtitle
+          label: 简述
+          validation: required
+        - $formkit: text
+          name: admin_email
+          label: 邮箱
+          validation: required
+        - $formkit: checkbox
+          name: "enable_comment"
+          label: "允许评论"
+          value: "true"
+          on-value: "true"
+          off-value: "false"
+
+    - group: footer
+      label: 页脚
+      formSchema:
+        - $formkit: array
+          name: sfooter_info
+          label: 底部信息
+          value:
+            - sf_title: 鄂ICP备xxxxxxx号
+              sf_link: https://beian.miit.gov.cn/
+              sf_img: /themes/halo-theme-vapor/assets/imgs/icpb.webp
+          itemLabels:
+            - type: image
+              label: $value.sf_img
+            - type: text
+              label: $value.sf_title
+          children:
+            - $formkit: text
+              name: sf_title
+              label: 信息文本
+            - $formkit: text
+              name: sf_link
+              label: 信息链接
+            - $formkit: attachment
+              name: sf_img
+              label: 图标
+              accepts:
+                - "image/*"
+        - $formkit: checkbox
+          name: show_stats
+          key: show_stats
+          id: show_stats
+          label: 显示统计信息
+          value: true
+          help: 在站点底部显示全站的统计信息
+
+    - group: custom
+      label: 扩展设置
+      formSchema:
+        - $formkit: textarea
+          name: keywords
+          label: SEO关键词
+          rows: 3
+        - $formkit: code
+          name: code_css
+          label: 自定义CSS代码
+          height: 200px
+          language: css
+        - $formkit: code
+          name: code_js
+          label: 自定义JavaScript代码
+          height: 200px
+          language: javascript
+        - $formkit: code
+          name: head_html
+          label: 自定义HTML代码-头部
+          height: 200px
+          language: html
+        - $formkit: code
+          name: footer_html
+          label: 自定义HTML代码-底部
+          height: 200px
+          language: html
+
+    - group: pluginPage
+      label: 特殊页面设置
+      formSchema:
+        - $formkit: text
+          name: douban_description
+          label: 豆瓣页面描述
+          value: 光影、旋律、文字、像素与舞台在此交汇，每段记录都藏着当时的心跳与感悟。
+        - $formkit: checkbox
+          name: "douban_comment"
+          label: "豆瓣页面允许评论"
+          value: "true"
+          on-value: "true"
+          off-value: "false"
+        - $formkit: text
+          name: moments_description
+          label: 瞬间页面描述
+          value: 生活碎片在此停泊，一句碎念、半帧风景、偶然心绪都被妥帖收藏，拼凑成时光的鲜活注脚。
+        - $formkit: checkbox
+          name: "moments_comment"
+          label: "瞬间页面允许评论"
+          value: "true"
+          on-value: "true"
+          off-value: "false"
+        - $formkit: text
+          name: equipment_description
+          label: 装备页面描述
+          value: 实物装备推荐，一起享受科技带来的乐趣
+        - $formkit: checkbox
+          name: "equipment_comment"
+          label: "装备页面允许评论"
+          value: "true"
+          on-value: "true"
+          off-value: "false"
+        - $formkit: text
+          name: photos_description
+          label: 图库页面描述
+          value: 帧帧光影凝住时光絮语，每幅画面都是笔尖未及的温柔心事与灵感回响。
+        - $formkit: checkbox
+          name: "photos_comment"
+          label: "图库页面允许评论"
+          value: "true"
+          on-value: "true"
+          off-value: "false"
